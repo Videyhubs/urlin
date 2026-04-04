@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>URLIN Shortin</title>
+<title>URLIN Pro</title>
 
 <style>
 body{
@@ -68,9 +68,10 @@ img{
   align-items:center;
 }
 .article{
-  line-height:1.9;
+  line-height:1.8;
 }
 .article p{
+  margin:14px 0;
   text-align:justify;
 }
 .sticky-cta{
@@ -78,6 +79,19 @@ img{
   bottom:15px;
   z-index:999;
   margin-top:20px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:20px;
+}
+.stat{
+  font-size:24px;
+  font-weight:bold;
+}
+.small{
+  font-size:12px;
+  color:#94a3b8;
 }
 </style>
 
@@ -112,14 +126,9 @@ function getRedirectTime(){
 }
 
 function saveRedirectTime(){
-  const value = parseInt(document.getElementById("redirectTime").value);
-
-  if(!value || value < 1){
-    alert("Minimum 1 second");
-    return;
-  }
-
-  localStorage.setItem("redirect_time", value);
+  const val = parseInt(document.getElementById("redirectTime").value);
+  if(!val || val < 1) return alert("Minimum 1 second");
+  localStorage.setItem("redirect_time", val);
   alert("Saved");
 }
 
@@ -162,16 +171,33 @@ function showPin(){
   `;
 }
 
-function generate(){
-  const input = document.getElementById("urlInput");
-  let url = input.value.trim();
+function saveHistory(code,url){
+  db.ref("history/"+code).set({
+    code,
+    url,
+    clicks:0,
+    createdAt:new Date().toLocaleString()
+  });
+}
 
+function updateClick(code){
+  db.ref("history/"+code).transaction(data=>{
+    if(data){
+      data.clicks = (data.clicks || 0) + 1;
+    }
+    return data;
+  });
+}
+
+function generate(){
+  let url = document.getElementById("urlInput").value.trim();
   if(!url) return alert("Enter URL");
 
   url = normalize(url);
   const code = randomCode();
 
-  db.ref("links/" + code).set({ url });
+  db.ref("links/"+code).set({url});
+  saveHistory(code,url);
 
   document.getElementById("result").innerHTML = `
     <div class="item">
@@ -179,6 +205,73 @@ function generate(){
       <button onclick="copyText('${DOMAIN}/#${code}')">Copy</button>
     </div>
   `;
+
+  loadAnalysis();
+}
+
+function bulk(){
+  const lines = document.getElementById("bulkInput")
+    .value.split("\n")
+    .filter(x=>x.trim());
+
+  let html = "";
+
+  lines.forEach(link=>{
+    const code = randomCode();
+    const url = normalize(link);
+
+    db.ref("links/"+code).set({url});
+    saveHistory(code,url);
+
+    html += `
+      <div class="item">
+        ${DOMAIN}/#${code}
+      </div>
+    `;
+  });
+
+  document.getElementById("bulkResult").innerHTML = html;
+  loadAnalysis();
+}
+
+function loadAnalysis(){
+  db.ref("history").once("value").then(snap=>{
+    const data = snap.val() || {};
+    let totalLinks = 0;
+    let totalClicks = 0;
+    let historyHTML = "";
+
+    Object.values(data).forEach(item=>{
+      totalLinks++;
+      totalClicks += item.clicks || 0;
+
+      historyHTML += `
+        <div class="item">
+          ${DOMAIN}/#${item.code}<br>
+          Clicks: ${item.clicks || 0}<br>
+          ${item.createdAt}
+        </div>
+      `;
+    });
+
+    document.getElementById("analysis").innerHTML = `
+      <div class="grid">
+        <div class="card">
+          <div class="stat">${totalLinks}</div>
+          <div class="small">Total Links</div>
+        </div>
+        <div class="card">
+          <div class="stat">${totalClicks}</div>
+          <div class="small">Total Clicks</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>History</h2>
+        ${historyHTML || "No history yet"}
+      </div>
+    `;
+  });
 }
 
 function dashboard(){
@@ -192,19 +285,32 @@ function dashboard(){
       </div>
 
       <div class="card">
-        <h2>Redirect Time</h2>
+        <h2>Bulk Generator</h2>
+        <textarea id="bulkInput" rows="5"></textarea>
+        <button onclick="bulk()">Generate Bulk</button>
+        <div id="bulkResult"></div>
+      </div>
+
+      <div class="card">
+        <h2>Redirect Settings</h2>
         <input id="redirectTime" type="number" min="1" value="${getRedirectTime()}">
         <button onclick="saveRedirectTime()">Save</button>
       </div>
+
+      <div id="analysis"></div>
     </div>
   `;
+
+  loadAnalysis();
 }
 
-function redirectPage(target){
+function redirectPage(target,code){
   if(!target){
-    app.innerHTML = "<h2 style='text-align:center'>Invalid target URL</h2>";
+    app.innerHTML = "<h2 style='text-align:center'>Invalid URL</h2>";
     return;
   }
+
+  updateClick(code);
 
   let sec = getRedirectTime();
   const article = getRandomArticle();
@@ -226,7 +332,7 @@ function redirectPage(target){
 
           <p><i>${article.metaDescription}</i></p>
 
-          <img src="https://picsum.photos/900/400?random=${Date.now()}">
+          <img src="https://picsum.photos/900/400?${Date.now()}">
 
           ${article.content}
 
@@ -245,51 +351,36 @@ function redirectPage(target){
     </div>
   `;
 
-  const countEl = document.getElementById("count");
-
   const timer = setInterval(()=>{
     sec--;
-
-    if(countEl){
-      countEl.innerText = "Redirect in " + sec + " sec";
-    }
+    document.getElementById("count").innerText = "Redirect in " + sec + " sec";
 
     if(sec <= 0){
       clearInterval(timer);
-
-      try{
-        window.location.href = target;
-      }catch(e){
-        app.innerHTML = "<h2 style='text-align:center'>Redirect failed</h2>";
-      }
+      window.location.href = target;
     }
   },1000);
 }
 
-window.onload = function(){
+window.onload = ()=>{
   const code = location.hash.replace("#","");
 
   if(code){
-    db.ref("links/" + code).once("value")
-      .then(snapshot=>{
-        const data = snapshot.val();
+    db.ref("links/"+code).once("value").then(snap=>{
+      const data = snap.val();
 
-        if(data && data.url){
-          redirectPage(data.url);
-        }else{
-          app.innerHTML = "<h2 style='text-align:center'>Link not found</h2>";
-        }
-      })
-      .catch(()=>{
-        app.innerHTML = "<h2 style='text-align:center'>Error loading link</h2>";
-      });
-
+      if(data && data.url){
+        redirectPage(data.url,code);
+      }else{
+        app.innerHTML = "<h2 style='text-align:center'>Link not found</h2>";
+      }
+    });
     return;
   }
 
   if(isLogin()) dashboard();
   else showPin();
-};
+}
 </script>
 </body>
 </html>
