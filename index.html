@@ -68,14 +68,54 @@ const DOMAIN = "https://urlin.biz.id";
 const PIN = "270491";
 
 const articles = [
-  "Fast HD video downloader with unlimited speed and secure streaming.",
-  "Watch premium video content online with smooth playback and offline mode.",
-  "Save videos instantly and enjoy ultra-fast cloud delivery system.",
-  "Advanced player with subtitle sync and adaptive streaming quality.",
-  "High-speed shortlink redirect with optimized content monetization.",
-  "Premium media access with fast countdown redirect technology.",
-  "Unlimited access to entertainment and video resources.",
-  "Smart redirect engine with dynamic article rotation."
+  {
+    title: "Fast HD Video Downloader",
+    content: "Download high-definition videos instantly with ultra-fast speed and secure cloud streaming technology. Our advanced platform supports multiple video formats including MP4, MKV, AVI, and MOV, ensuring compatibility across desktop, mobile, and tablet devices. Experience smooth playback, reliable offline saving, and optimized bandwidth usage for faster access."
+  },
+  {
+    title: "Premium Online Video Player",
+    content: "Watch premium video content online with smooth playback, adaptive quality settings, and intelligent buffering technology. Enjoy crystal-clear HD and Full HD streaming, subtitle synchronization, and immersive fullscreen mode designed for the best user experience on all devices."
+  },
+  {
+    title: "Ultra Fast Media Delivery",
+    content: "Our intelligent delivery network ensures lightning-fast access to videos and media files from any location. With optimized routing, content acceleration, and smart redirect systems, users can enjoy seamless viewing with minimal loading time and improved stability."
+  },
+  {
+    title: "Unlimited Entertainment Access",
+    content: "Access unlimited entertainment resources with secure and fast cloud-powered video technology. From educational content to premium media streaming, enjoy uninterrupted playback and instant redirects powered by high-performance infrastructure."
+  },
+  {
+    title: "Advanced Streaming Experience",
+    content: "Enjoy next-generation streaming with dynamic resolution adjustment, subtitle support, and enhanced playback controls. The system automatically adapts to your network speed, ensuring smooth and uninterrupted video access anytime."
+  },
+  {
+    title: "Secure Redirect Technology",
+    content: "Our smart redirect engine combines speed, reliability, and security to provide the best user journey. Each link is optimized for rapid delivery while maintaining accurate tracking, history logs, and click analysis for better performance insights."
+  },
+  {
+    title: "Cloud Video Access Platform",
+    content: "Modern cloud-based infrastructure allows fast media loading, secure link redirection, and high-speed content distribution. Built for scalability, the platform supports large traffic volumes with stable and efficient resource delivery."
+  },
+  {
+    title: "Professional Media Tools",
+    content: "Advanced video downloader and playback solutions help users save, manage, and watch premium content with ease.<br><br>Features include smart resume, offline storage, and high-quality rendering for a premium multimedia experience."
+  },
+  {
+    title: "Smart Video Optimization",
+    content: "Every media file is optimized for fast loading, reduced buffering, and improved compatibility.<br><br>The smart optimization engine enhances playback quality while minimizing bandwidth consumption for a smooth viewing experience."
+  },
+  {
+    title: "Instant Redirect Access",
+    content: "Fast countdown redirect technology ensures users reach their destination quickly while engaging with dynamic content and premium article displays.<br><br>Designed for performance and monetization optimization."
+  },
+  {
+    title: "HD Media Experience",
+    content: "Enjoy stunning HD media playback with advanced rendering technology, fast loading speed, and responsive design optimized for every screen size.<br><br>Experience seamless transitions and modern video delivery solutions."
+  },
+  {
+    title: "Premium Content Gateway",
+    content: "A secure gateway for accessing premium digital content, streaming resources, and downloadable video files with intelligent cloud routing and advanced click analytics."
+  }
 ];
 
 function randomArticle(){
@@ -340,7 +380,7 @@ function redirectPage(target,code){
       clearInterval(timer);
       window.location.replace(target);
     }
-  },1000);
+  },300);
 }
 
 window.onload = ()=>{
