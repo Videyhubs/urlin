@@ -1,4 +1,10 @@
-const categories = ["technology","business","entertainment"];
+const categories = [
+  "technology",
+  "business",
+  "entertainment",
+  "marketing",
+  "lifestyle"
+];
 
 const titles = [
   "Latest Technology Trends",
@@ -24,7 +30,7 @@ const authors = [
 ];
 
 function randomFrom(arr){
-  return arr[Math.floor(Math.random() * arr.length)];
+  return arr[Math.floor(Math.random()*arr.length)];
 }
 
 function slugify(text){
@@ -33,14 +39,14 @@ function slugify(text){
 
 function randomDate(){
   return new Date(
-    Date.now() - Math.random() * 10000000000
+    Date.now() - Math.random()*10000000000
   ).toLocaleDateString("en-US");
 }
 
 function buildContent(){
   let html = "";
-  for(let i=0;i<10;i++){
-    html += `<p>${randomFrom(paragraphs)}</p><br><br>`;
+  for(let i=0;i<6;i++){
+    html += `<p>${randomFrom(paragraphs)}</p>`;
   }
   return html;
 }
