@@ -79,14 +79,18 @@ img{
   font-size:12px;
   color:#94a3b8
 }
+.article{
+  line-height:1.9;
+}
 .article p{
-  line-height:1.8;
-  text-align:justify
+  text-align:justify;
+  margin:0;
 }
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="article.js"></script>
 </head>
 <body>
 <div id="app"></div>
@@ -107,27 +111,6 @@ const db = firebase.database();
 
 const DOMAIN = "https://urlin.biz.id";
 const PIN = "270491";
-
-const redirectPool = [
-  "https://google.com",
-  "https://youtube.com",
-  "https://bing.com"
-];
-
-const rssFeeds = [
-  "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
-  "https://feeds.bbci.co.uk/news/rss.xml",
-  "https://www.theguardian.com/world/rss"
-];
-
-function getRandomFeed(){
-  return rssFeeds[Math.floor(Math.random()*rssFeeds.length)];
-}
-
-function getSmartRedirect(target){
-  const pool = [...redirectPool, target];
-  return pool[Math.floor(Math.random()*pool.length)];
-}
 
 function normalize(url){
   return /^https?:\/\//i.test(url) ? url : "https://" + url;
@@ -169,8 +152,7 @@ function showPin(){
 
 function saveHistory(code,url){
   db.ref("history/"+code).set({
-    code,
-    url,
+    code,url,
     clicks:0,
     createdAt:new Date().toLocaleString()
   });
@@ -186,12 +168,10 @@ function generate(){
   db.ref("links/"+code).set({url});
   saveHistory(code,url);
 
-  const short = DOMAIN + "/#" + code;
-
   result.innerHTML = `
     <div class="item">
-      ${short}
-      <button onclick="copyText('${short}')">Copy</button>
+      ${DOMAIN}/#${code}
+      <button onclick="copyText('${DOMAIN}/#${code}')">Copy</button>
     </div>
   `;
 
@@ -209,11 +189,7 @@ function bulk(){
     db.ref("links/"+code).set({url});
     saveHistory(code,url);
 
-    html += `
-      <div class="item">
-        ${DOMAIN}/#${code}
-      </div>
-    `;
+    html += `<div class="item">${DOMAIN}/#${code}</div>`;
   });
 
   bulkResult.innerHTML = html;
@@ -248,72 +224,9 @@ function loadAnalysis(){
 
 function updateClick(code){
   db.ref("history/"+code).transaction(data=>{
-    if(data){
-      data.clicks = (data.clicks || 0)+1;
-    }
+    if(data) data.clicks = (data.clicks || 0)+1;
     return data;
   });
-}
-
-async function fetchRandomArticle(){
-  const feed = getRandomFeed();
-
-  try{
-    const proxy = "https://api.allorigins.win/raw?url=";
-    const res = await fetch(proxy + encodeURIComponent(feed));
-    const xmlText = await res.text();
-
-    const parser = new DOMParser();
-    const xml = parser.parseFromString(xmlText,"text/xml");
-
-    const items = xml.querySelectorAll("item");
-
-    if(!items.length){
-      return defaultArticle();
-    }
-
-    const item = items[Math.floor(Math.random()*items.length)];
-
-    const title =
-      item.querySelector("title")?.textContent ||
-      "Latest News";
-
-    const desc =
-      item.querySelector("description")?.textContent ||
-      "Loading premium content";
-
-    return `
-      <div class="article">
-        <h2>${title}</h2>
-        <img src="https://picsum.photos/900/400?${Math.random()}">
-        <p>${desc}</p>
-        <button onclick="nextArticle()">Next Article</button>
-      </div>
-    `;
-  }catch(e){
-    return defaultArticle();
-  }
-}
-
-function defaultArticle(){
-  return `
-    <div class="article">
-      <h2>Premium Content Access</h2>
-      <img src="https://picsum.photos/900/400?${Math.random()}">
-      <p>
-        Welcome to our premium media access page.
-        Dynamic content is loaded here before
-        redirecting securely to the destination.
-      </p>
-      <button onclick="nextArticle()">Next Article</button>
-    </div>
-  `;
-}
-
-async function nextArticle(){
-  const box = document.getElementById("articleBox");
-  box.innerHTML = "<p>Loading next article...</p>";
-  box.innerHTML = await fetchRandomArticle();
 }
 
 function dashboard(){
@@ -344,29 +257,24 @@ function redirectPage(target,code){
   updateClick(code);
 
   let sec = 3;
-  const smartTarget = getSmartRedirect(target);
+  const article = getRandomArticle();
 
   app.innerHTML = `
     <div class="container">
       <div class="card">
-        <div id="articleBox">
-          <p>Loading article...</p>
+        <div class="article">
+          <h2>${article.title}</h2>
+          <img src="https://picsum.photos/900/400?${Math.random()}">
+          ${article.content}
         </div>
 
         <div class="center">
           <div class="loader"></div>
           <p id="count"></p>
-          <button onclick="window.location.href='${smartTarget}'">
-            Skip Now
-          </button>
         </div>
       </div>
     </div>
   `;
-
-  fetchRandomArticle().then(html=>{
-    articleBox.innerHTML = html;
-  });
 
   const timer = setInterval(()=>{
     count.innerText = "Redirect in " + sec + " sec";
@@ -374,9 +282,9 @@ function redirectPage(target,code){
 
     if(sec < 0){
       clearInterval(timer);
-      window.location.replace(smartTarget);
+      window.location.replace(target);
     }
-  },1000);
+  },500);
 }
 
 window.onload = ()=>{
