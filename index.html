@@ -6,9 +6,23 @@
 <title>URLIN Shortin Pro</title>
 
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#0b1220;color:#fff}
-.container{max-width:1000px;margin:auto;padding:20px}
-.card{background:#111827;padding:20px;border-radius:15px;margin-top:20px}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#0b1220;
+  color:#fff
+}
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:20px
+}
+.card{
+  background:#111827;
+  padding:20px;
+  border-radius:15px;
+  margin-top:20px
+}
 input,textarea,button{
   width:100%;
   padding:12px;
@@ -17,7 +31,11 @@ input,textarea,button{
   border-radius:10px;
   box-sizing:border-box
 }
-button{background:#22c55e;color:#fff;cursor:pointer}
+button{
+  background:#22c55e;
+  color:#fff;
+  cursor:pointer
+}
 .item{
   background:#020617;
   padding:12px;
@@ -25,10 +43,15 @@ button{background:#22c55e;color:#fff;cursor:pointer}
   margin-top:10px;
   word-break:break-all
 }
-img{max-width:100%;border-radius:10px;margin:15px 0}
+img{
+  max-width:100%;
+  border-radius:10px;
+  margin:15px 0
+}
 .loader{
   margin:20px auto;
-  width:60px;height:60px;
+  width:60px;
+  height:60px;
   border:5px solid #1f2937;
   border-top:5px solid #22c55e;
   border-radius:50%;
@@ -38,13 +61,27 @@ img{max-width:100%;border-radius:10px;margin:15px 0}
   0%{transform:rotate(0)}
   100%{transform:rotate(360deg)}
 }
-.center{display:flex;flex-direction:column;align-items:center}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
-.stat{font-size:24px;font-weight:bold}
-.small{font-size:12px;color:#94a3b8}
+.center{
+  display:flex;
+  flex-direction:column;
+  align-items:center
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:20px
+}
+.stat{
+  font-size:24px;
+  font-weight:bold
+}
+.small{
+  font-size:12px;
+  color:#94a3b8
+}
 .article p{
   line-height:1.8;
-  text-align:justify;
+  text-align:justify
 }
 </style>
 
@@ -71,50 +108,25 @@ const db = firebase.database();
 const DOMAIN = "https://urlin.biz.id";
 const PIN = "270491";
 
-const articles = [
-{
-title:"Ultimate HD Video Downloader and Streaming Experience",
-content:`
-Modern digital media platforms have transformed the way people consume video content online. High-definition video downloading and streaming technology now offers users the ability to access premium content quickly, securely, and without interruption. With advanced optimization systems, videos can be delivered in multiple formats including MP4, AVI, MKV, and MOV, making them compatible with almost every device available today.
-
-Users increasingly demand faster access, smoother playback, and reliable offline viewing capabilities. This is why modern streaming systems use intelligent cloud routing and adaptive quality technology to automatically adjust playback quality according to internet speed. As a result, viewers can continue watching without buffering even when the network becomes unstable.
-
-Another major advantage is secure delivery. Advanced encryption and redirect systems help ensure that content remains protected while maintaining rapid access times. This technology is especially important for premium video platforms and professional media tools.
-
-Offline support is also one of the most requested features in modern video systems. Users can save content directly to their devices and watch later without requiring a constant internet connection. This improves accessibility and convenience, especially for mobile users.
-
-With the integration of cloud acceleration, content distribution networks, and smart redirect technology, video delivery systems have become significantly more efficient. This allows content creators and platform owners to scale traffic more effectively while maintaining excellent user experience.
-
-The future of video streaming continues to evolve rapidly with AI-based optimization, better compression algorithms, and improved compatibility across browsers and operating systems. This ensures long-term performance and user satisfaction for both content providers and viewers.
-`
-},
-{
-title:"Premium Media Access and Smart Redirect Technology",
-content:`
-Smart redirect technology has become an essential part of modern web infrastructure, especially for content delivery, shortlink systems, and premium media access platforms. It enables users to be redirected quickly and securely to the intended destination while maintaining advanced analytics and click-tracking capabilities.
-
-The system works by creating lightweight URLs that route users through optimized servers. During this process, important data such as click count, access time, and device behavior can be recorded for analysis purposes. This allows administrators to monitor traffic trends and improve performance over time.
-
-One of the strongest benefits of smart redirect technology is monetization potential. By displaying optimized content, countdown timers, or promotional articles before redirecting users, platforms can increase engagement and improve revenue opportunities.
-
-Security also plays a crucial role. Redirect systems often include anti-abuse mechanisms, rate-limiting, and validation layers to prevent malicious access or bot traffic. These systems help preserve both data integrity and user trust.
-
-In addition, modern redirect platforms now integrate responsive article layouts, random content rotation, and dynamic image rendering to make the redirect page feel more premium and engaging. This improves dwell time and creates a better overall user experience.
-
-With cloud-based architecture and scalable database integration, these systems can handle large volumes of traffic while remaining stable and fast. This makes them suitable for professional shortlink services, media portals, and digital marketing campaigns.
-`
-}
+const redirectPool = [
+  "https://google.com",
+  "https://youtube.com",
+  "https://bing.com"
 ];
 
-function randomArticle(){
-  const item = articles[Math.floor(Math.random()*articles.length)];
-  return `
-    <div class="article">
-      <h2>${item.title}</h2>
-      <img src="https://picsum.photos/900/400?${Math.random()}">
-      <p>${item.content}</p>
-    </div>
-  `;
+const rssFeeds = [
+  "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
+  "https://feeds.bbci.co.uk/news/rss.xml",
+  "https://www.theguardian.com/world/rss"
+];
+
+function getRandomFeed(){
+  return rssFeeds[Math.floor(Math.random()*rssFeeds.length)];
+}
+
+function getSmartRedirect(target){
+  const pool = [...redirectPool, target];
+  return pool[Math.floor(Math.random()*pool.length)];
 }
 
 function normalize(url){
@@ -157,7 +169,8 @@ function showPin(){
 
 function saveHistory(code,url){
   db.ref("history/"+code).set({
-    code,url,
+    code,
+    url,
     clicks:0,
     createdAt:new Date().toLocaleString()
   });
@@ -187,7 +200,6 @@ function generate(){
 
 function bulk(){
   const lines = bulkInput.value.split("\n").filter(x=>x.trim());
-
   let html = "";
 
   lines.forEach(link=>{
@@ -211,7 +223,6 @@ function bulk(){
 function loadAnalysis(){
   db.ref("history").once("value").then(snap=>{
     const data = snap.val() || {};
-
     let totalLinks = 0;
     let totalClicks = 0;
 
@@ -238,10 +249,71 @@ function loadAnalysis(){
 function updateClick(code){
   db.ref("history/"+code).transaction(data=>{
     if(data){
-      data.clicks = (data.clicks||0)+1;
+      data.clicks = (data.clicks || 0)+1;
     }
     return data;
   });
+}
+
+async function fetchRandomArticle(){
+  const feed = getRandomFeed();
+
+  try{
+    const proxy = "https://api.allorigins.win/raw?url=";
+    const res = await fetch(proxy + encodeURIComponent(feed));
+    const xmlText = await res.text();
+
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText,"text/xml");
+
+    const items = xml.querySelectorAll("item");
+
+    if(!items.length){
+      return defaultArticle();
+    }
+
+    const item = items[Math.floor(Math.random()*items.length)];
+
+    const title =
+      item.querySelector("title")?.textContent ||
+      "Latest News";
+
+    const desc =
+      item.querySelector("description")?.textContent ||
+      "Loading premium content";
+
+    return `
+      <div class="article">
+        <h2>${title}</h2>
+        <img src="https://picsum.photos/900/400?${Math.random()}">
+        <p>${desc}</p>
+        <button onclick="nextArticle()">Next Article</button>
+      </div>
+    `;
+  }catch(e){
+    return defaultArticle();
+  }
+}
+
+function defaultArticle(){
+  return `
+    <div class="article">
+      <h2>Premium Content Access</h2>
+      <img src="https://picsum.photos/900/400?${Math.random()}">
+      <p>
+        Welcome to our premium media access page.
+        Dynamic content is loaded here before
+        redirecting securely to the destination.
+      </p>
+      <button onclick="nextArticle()">Next Article</button>
+    </div>
+  `;
+}
+
+async function nextArticle(){
+  const box = document.getElementById("articleBox");
+  box.innerHTML = "<p>Loading next article...</p>";
+  box.innerHTML = await fetchRandomArticle();
 }
 
 function dashboard(){
@@ -271,19 +343,30 @@ function dashboard(){
 function redirectPage(target,code){
   updateClick(code);
 
-  let sec = 5;
+  let sec = 3;
+  const smartTarget = getSmartRedirect(target);
 
   app.innerHTML = `
     <div class="container">
       <div class="card">
-        ${randomArticle()}
+        <div id="articleBox">
+          <p>Loading article...</p>
+        </div>
+
         <div class="center">
           <div class="loader"></div>
           <p id="count"></p>
+          <button onclick="window.location.href='${smartTarget}'">
+            Skip Now
+          </button>
         </div>
       </div>
     </div>
   `;
+
+  fetchRandomArticle().then(html=>{
+    articleBox.innerHTML = html;
+  });
 
   const timer = setInterval(()=>{
     count.innerText = "Redirect in " + sec + " sec";
@@ -291,9 +374,9 @@ function redirectPage(target,code){
 
     if(sec < 0){
       clearInterval(timer);
-      window.location.replace(target);
+      window.location.replace(smartTarget);
     }
-  },300);
+  },1000);
 }
 
 window.onload = ()=>{
@@ -306,7 +389,8 @@ window.onload = ()=>{
       if(data && data.url){
         redirectPage(data.url,code);
       }else{
-        document.body.innerHTML="<h2 style='text-align:center'>Link not found</h2>";
+        document.body.innerHTML =
+          "<h2 style='text-align:center'>Link not found</h2>";
       }
     });
     return;
