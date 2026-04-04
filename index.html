@@ -6,15 +6,15 @@
 <title>URLIN Shortin Pro</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
+body{margin:0;font-family:Arial,sans-serif;background:#0b1220;color:#fff}
 .container{max-width:1000px;margin:auto;padding:20px}
 .card{background:#111827;padding:20px;border-radius:15px;margin-top:20px}
 input,textarea,button{
+  width:100%;
   padding:12px;
   margin:8px 0;
-  border-radius:10px;
   border:none;
-  width:100%;
+  border-radius:10px;
   box-sizing:border-box
 }
 button{background:#22c55e;color:#fff;cursor:pointer}
@@ -29,9 +29,9 @@ img{max-width:100%;border-radius:10px;margin:15px 0}
 .loader{
   margin:20px auto;
   width:60px;height:60px;
-  border-radius:50%;
   border:5px solid #1f2937;
   border-top:5px solid #22c55e;
+  border-radius:50%;
   animation:spin 1s linear infinite
 }
 @keyframes spin{
@@ -40,8 +40,12 @@ img{max-width:100%;border-radius:10px;margin:15px 0}
 }
 .center{display:flex;flex-direction:column;align-items:center}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
-.stat{font-size:20px;font-weight:bold}
+.stat{font-size:24px;font-weight:bold}
 .small{font-size:12px;color:#94a3b8}
+.article p{
+  line-height:1.8;
+  text-align:justify;
+}
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -68,62 +72,49 @@ const DOMAIN = "https://urlin.biz.id";
 const PIN = "270491";
 
 const articles = [
-  {
-    title: "Fast HD Video Downloader",
-    content: "Download high-definition videos instantly with ultra-fast speed and secure cloud streaming technology. Our advanced platform supports multiple video formats including MP4, MKV, AVI, and MOV, ensuring compatibility across desktop, mobile, and tablet devices. Experience smooth playback, reliable offline saving, and optimized bandwidth usage for faster access."
-  },
-  {
-    title: "Premium Online Video Player",
-    content: "Watch premium video content online with smooth playback, adaptive quality settings, and intelligent buffering technology. Enjoy crystal-clear HD and Full HD streaming, subtitle synchronization, and immersive fullscreen mode designed for the best user experience on all devices."
-  },
-  {
-    title: "Ultra Fast Media Delivery",
-    content: "Our intelligent delivery network ensures lightning-fast access to videos and media files from any location. With optimized routing, content acceleration, and smart redirect systems, users can enjoy seamless viewing with minimal loading time and improved stability."
-  },
-  {
-    title: "Unlimited Entertainment Access",
-    content: "Access unlimited entertainment resources with secure and fast cloud-powered video technology. From educational content to premium media streaming, enjoy uninterrupted playback and instant redirects powered by high-performance infrastructure."
-  },
-  {
-    title: "Advanced Streaming Experience",
-    content: "Enjoy next-generation streaming with dynamic resolution adjustment, subtitle support, and enhanced playback controls. The system automatically adapts to your network speed, ensuring smooth and uninterrupted video access anytime."
-  },
-  {
-    title: "Secure Redirect Technology",
-    content: "Our smart redirect engine combines speed, reliability, and security to provide the best user journey. Each link is optimized for rapid delivery while maintaining accurate tracking, history logs, and click analysis for better performance insights."
-  },
-  {
-    title: "Cloud Video Access Platform",
-    content: "Modern cloud-based infrastructure allows fast media loading, secure link redirection, and high-speed content distribution. Built for scalability, the platform supports large traffic volumes with stable and efficient resource delivery."
-  },
-  {
-    title: "Professional Media Tools",
-    content: "Advanced video downloader and playback solutions help users save, manage, and watch premium content with ease.<br><br>Features include smart resume, offline storage, and high-quality rendering for a premium multimedia experience."
-  },
-  {
-    title: "Smart Video Optimization",
-    content: "Every media file is optimized for fast loading, reduced buffering, and improved compatibility.<br><br>The smart optimization engine enhances playback quality while minimizing bandwidth consumption for a smooth viewing experience."
-  },
-  {
-    title: "Instant Redirect Access",
-    content: "Fast countdown redirect technology ensures users reach their destination quickly while engaging with dynamic content and premium article displays.<br><br>Designed for performance and monetization optimization."
-  },
-  {
-    title: "HD Media Experience",
-    content: "Enjoy stunning HD media playback with advanced rendering technology, fast loading speed, and responsive design optimized for every screen size.<br><br>Experience seamless transitions and modern video delivery solutions."
-  },
-  {
-    title: "Premium Content Gateway",
-    content: "A secure gateway for accessing premium digital content, streaming resources, and downloadable video files with intelligent cloud routing and advanced click analytics."
-  }
+{
+title:"Ultimate HD Video Downloader and Streaming Experience",
+content:`
+Modern digital media platforms have transformed the way people consume video content online. High-definition video downloading and streaming technology now offers users the ability to access premium content quickly, securely, and without interruption. With advanced optimization systems, videos can be delivered in multiple formats including MP4, AVI, MKV, and MOV, making them compatible with almost every device available today.
+
+Users increasingly demand faster access, smoother playback, and reliable offline viewing capabilities. This is why modern streaming systems use intelligent cloud routing and adaptive quality technology to automatically adjust playback quality according to internet speed. As a result, viewers can continue watching without buffering even when the network becomes unstable.
+
+Another major advantage is secure delivery. Advanced encryption and redirect systems help ensure that content remains protected while maintaining rapid access times. This technology is especially important for premium video platforms and professional media tools.
+
+Offline support is also one of the most requested features in modern video systems. Users can save content directly to their devices and watch later without requiring a constant internet connection. This improves accessibility and convenience, especially for mobile users.
+
+With the integration of cloud acceleration, content distribution networks, and smart redirect technology, video delivery systems have become significantly more efficient. This allows content creators and platform owners to scale traffic more effectively while maintaining excellent user experience.
+
+The future of video streaming continues to evolve rapidly with AI-based optimization, better compression algorithms, and improved compatibility across browsers and operating systems. This ensures long-term performance and user satisfaction for both content providers and viewers.
+`
+},
+{
+title:"Premium Media Access and Smart Redirect Technology",
+content:`
+Smart redirect technology has become an essential part of modern web infrastructure, especially for content delivery, shortlink systems, and premium media access platforms. It enables users to be redirected quickly and securely to the intended destination while maintaining advanced analytics and click-tracking capabilities.
+
+The system works by creating lightweight URLs that route users through optimized servers. During this process, important data such as click count, access time, and device behavior can be recorded for analysis purposes. This allows administrators to monitor traffic trends and improve performance over time.
+
+One of the strongest benefits of smart redirect technology is monetization potential. By displaying optimized content, countdown timers, or promotional articles before redirecting users, platforms can increase engagement and improve revenue opportunities.
+
+Security also plays a crucial role. Redirect systems often include anti-abuse mechanisms, rate-limiting, and validation layers to prevent malicious access or bot traffic. These systems help preserve both data integrity and user trust.
+
+In addition, modern redirect platforms now integrate responsive article layouts, random content rotation, and dynamic image rendering to make the redirect page feel more premium and engaging. This improves dwell time and creates a better overall user experience.
+
+With cloud-based architecture and scalable database integration, these systems can handle large volumes of traffic while remaining stable and fast. This makes them suitable for professional shortlink services, media portals, and digital marketing campaigns.
+`
+}
 ];
 
 function randomArticle(){
-  return articles[Math.floor(Math.random()*articles.length)];
-}
-
-function randomImage(){
-  return "https://picsum.photos/900/400?" + Math.random();
+  const item = articles[Math.floor(Math.random()*articles.length)];
+  return `
+    <div class="article">
+      <h2>${item.title}</h2>
+      <img src="https://picsum.photos/900/400?${Math.random()}">
+      <p>${item.content}</p>
+    </div>
+  `;
 }
 
 function normalize(url){
@@ -132,18 +123,6 @@ function normalize(url){
 
 function randomCode(){
   return Math.random().toString(36).substring(2,7);
-}
-
-function generateUniqueCode(callback){
-  const code = randomCode();
-
-  db.ref("links/" + code).once("value").then(snap=>{
-    if(snap.exists()){
-      generateUniqueCode(callback);
-    }else{
-      callback(code);
-    }
-  });
 }
 
 function copyText(text){
@@ -176,11 +155,9 @@ function showPin(){
   `;
 }
 
-function saveHistory(code,url,type="single"){
+function saveHistory(code,url){
   db.ref("history/"+code).set({
-    code,
-    url,
-    type,
+    code,url,
     clicks:0,
     createdAt:new Date().toLocaleString()
   });
@@ -191,78 +168,44 @@ function generate(){
   if(!url) return alert("Enter URL");
 
   url = normalize(url);
+  const code = randomCode();
 
-  generateUniqueCode(code=>{
-    db.ref("links/"+code).set({url});
+  db.ref("links/"+code).set({url});
+  saveHistory(code,url);
 
-    saveHistory(code,url,"single");
+  const short = DOMAIN + "/#" + code;
 
-    const short = DOMAIN + "/#" + code;
+  result.innerHTML = `
+    <div class="item">
+      ${short}
+      <button onclick="copyText('${short}')">Copy</button>
+    </div>
+  `;
 
-    result.innerHTML = `
-      <div class="item">
-        ${short}
-        <button onclick="copyText('${short}')">Copy</button>
-      </div>
-    `;
-
-    loadAnalysis();
-  });
+  loadAnalysis();
 }
 
 function bulk(){
   const lines = bulkInput.value.split("\n").filter(x=>x.trim());
+
   let html = "";
 
   lines.forEach(link=>{
-    const url = normalize(link.trim());
+    const code = randomCode();
+    const url = normalize(link);
 
-    generateUniqueCode(code=>{
-      db.ref("links/"+code).set({url});
-      saveHistory(code,url,"bulk");
+    db.ref("links/"+code).set({url});
+    saveHistory(code,url);
 
-      const short = DOMAIN + "/#" + code;
-
-      html += `
-        <div class="item">
-          ${short}
-          <button onclick="copyText('${short}')">Copy</button>
-        </div>
-      `;
-
-      bulkResult.innerHTML = html;
-      loadAnalysis();
-    });
+    html += `
+      <div class="item">
+        ${DOMAIN}/#${code}
+      </div>
+    `;
   });
-}
 
-function updateClick(code){
-  db.ref("history/"+code).transaction(data=>{
-    if(data){
-      data.clicks = (data.clicks||0)+1;
-      data.lastClick = new Date().toLocaleString();
-    }
-    return data;
-  });
-}
-
-function deleteHistory(code){
-  db.ref("history/"+code).remove();
-  db.ref("links/"+code).remove();
+  bulkResult.innerHTML = html;
   loadAnalysis();
-}
-
-function exportHistory(){
-  db.ref("history").once("value").then(snap=>{
-    const data = JSON.stringify(snap.val(),null,2);
-    const blob = new Blob([data],{type:"application/json"});
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "history.json";
-    a.click();
-  });
 }
 
 function loadAnalysis(){
@@ -271,27 +214,11 @@ function loadAnalysis(){
 
     let totalLinks = 0;
     let totalClicks = 0;
-    let top = [];
-    let html = "";
 
-    Object.values(data).forEach(item=>{
+    Object.values(data).forEach(x=>{
       totalLinks++;
-      totalClicks += item.clicks || 0;
-      top.push(item);
-
-      html += `
-        <div class="item">
-          <b>${item.code}</b><br>
-          ${item.url}<br>
-          Type: ${item.type}<br>
-          Clicks: ${item.clicks || 0}<br>
-          Created: ${item.createdAt}<br>
-          <button onclick="deleteHistory('${item.code}')">Delete</button>
-        </div>
-      `;
+      totalClicks += x.clicks || 0;
     });
-
-    top.sort((a,b)=>(b.clicks||0)-(a.clicks||0));
 
     analysis.innerHTML = `
       <div class="grid">
@@ -304,29 +231,22 @@ function loadAnalysis(){
           <div class="small">Total Clicks</div>
         </div>
       </div>
-
-      <div class="card">
-        <h3>Top Clicked</h3>
-        ${(top[0]) ? `
-          <div class="item">
-            ${top[0].code}<br>
-            Clicks: ${top[0].clicks || 0}
-          </div>
-        ` : "No data"}
-      </div>
-
-      <div class="card">
-        <h3>Full History</h3>
-        ${html}
-      </div>
     `;
+  });
+}
+
+function updateClick(code){
+  db.ref("history/"+code).transaction(data=>{
+    if(data){
+      data.clicks = (data.clicks||0)+1;
+    }
+    return data;
   });
 }
 
 function dashboard(){
   app.innerHTML = `
     <div class="container">
-
       <div class="card">
         <h2>Create Shortlink</h2>
         <input id="urlInput" placeholder="Enter URL">
@@ -336,17 +256,12 @@ function dashboard(){
 
       <div class="card">
         <h2>Bulk Generator</h2>
-        <textarea id="bulkInput" rows="6"></textarea>
+        <textarea id="bulkInput" rows="5"></textarea>
         <button onclick="bulk()">Generate Bulk</button>
         <div id="bulkResult"></div>
       </div>
 
-      <div class="card">
-        <button onclick="exportHistory()">Export JSON</button>
-      </div>
-
       <div id="analysis"></div>
-
     </div>
   `;
 
@@ -356,14 +271,12 @@ function dashboard(){
 function redirectPage(target,code){
   updateClick(code);
 
-  let sec = Math.floor(Math.random()*3)+5;
+  let sec = 5;
 
   app.innerHTML = `
     <div class="container">
       <div class="card">
-        <h2>Premium Video Access</h2>
-        <img src="${randomImage()}">
-        <p>${randomArticle()}</p>
+        ${randomArticle()}
         <div class="center">
           <div class="loader"></div>
           <p id="count"></p>
