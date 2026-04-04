@@ -1,60 +1,199 @@
-const seoTopics = [
-  "Best HD Video Downloader",
-  "Fast Online Streaming Platform",
-  "Premium Media Access Service",
-  "Secure Video Redirect System",
-  "Unlimited HD Video Player",
-  "Top Video Download Tools",
-  "Fast Content Delivery Network",
-  "Premium Streaming Experience",
-  "Smart Shortlink Redirect",
-  "Advanced Media Playback"
-];
+const niches = {
+  technology: {
+    titles: [
+      "Latest Technology Trends",
+      "AI and Future Innovation",
+      "Modern Cloud Infrastructure",
+      "Best Software Solutions",
+      "Advanced Digital Systems"
+    ],
+    paragraphs: [
+      "Technology continues to evolve rapidly, transforming how businesses and individuals interact with digital systems.",
+      "Artificial intelligence and cloud computing are now central to modern innovation strategies.",
+      "Companies increasingly rely on scalable infrastructure to improve operational efficiency.",
+      "Fast-loading platforms and optimized user interfaces are essential for digital success.",
+      "Advanced cybersecurity systems now protect data across global networks."
+    ]
+  },
 
-const introParagraphs = [
-  "In today’s digital era, users expect instant access to premium online content with fast loading speeds and stable performance across all devices.",
-  "Modern web platforms are now built with advanced content delivery systems that focus on speed, user experience, and secure access.",
-  "As internet traffic continues to grow, optimized media access and redirect technologies are becoming increasingly important for content providers."
-];
+  business: {
+    titles: [
+      "Business Growth Strategies",
+      "Startup Development Guide",
+      "Modern Corporate Management",
+      "Scaling Business Operations",
+      "Digital Business Transformation"
+    ],
+    paragraphs: [
+      "Modern businesses require flexible strategies to remain competitive in changing markets.",
+      "Digital transformation helps organizations improve productivity and customer engagement.",
+      "Strong leadership and innovation are essential for long-term growth.",
+      "Companies now rely heavily on analytics and performance tracking tools.",
+      "Customer-centric approaches continue to drive business expansion."
+    ]
+  },
 
-const bodyParagraphs = [
-  "A professional content platform must deliver pages quickly while maintaining responsive layouts for desktop and mobile visitors. This ensures visitors remain engaged and reduces bounce rates significantly.",
-  "Advanced cloud delivery systems help improve website speed by serving content from distributed locations. This technology allows faster page rendering and smoother transitions between pages.",
-  "SEO-optimized content pages help search engines better understand the website structure, increasing the chance of ranking for competitive keywords and long-tail phrases.",
-  "High-quality article presentation combined with proper spacing and readable formatting creates a more professional appearance similar to modern news websites.",
-  "Premium redirect systems also help website owners monitor clicks, analyze visitor activity, and improve overall performance using real-time data.",
-  "User retention improves dramatically when articles are structured with readable paragraphs, consistent headings, and well-spaced content blocks.",
-  "Modern shortlink pages are often combined with long-form content to create a more authentic and engaging experience for visitors."
-];
+  entertainment: {
+    titles: [
+      "Top Entertainment Trends",
+      "Streaming Media Growth",
+      "Digital Content Revolution",
+      "Online Video Experience",
+      "Modern Media Platforms"
+    ],
+    paragraphs: [
+      "Entertainment platforms continue to grow with the rise of streaming technology.",
+      "Digital content now reaches global audiences faster than ever before.",
+      "Premium video access systems improve user engagement and retention.",
+      "Modern media websites focus heavily on responsive design and content quality.",
+      "Users expect fast access and seamless playback experiences."
+    ]
+  },
 
-const closingParagraphs = [
-  "As digital platforms continue evolving, fast access and high-quality content remain key factors in delivering the best user experience.",
-  "This technology-driven approach helps modern websites stay competitive while improving both user satisfaction and monetization potential.",
-  "By combining SEO-friendly content with smart redirect systems, websites can achieve better engagement and stronger long-term performance."
-];
+  health: {
+    titles: [
+      "Healthy Lifestyle Guide",
+      "Wellness and Fitness Trends",
+      "Modern Healthcare Innovation",
+      "Nutrition and Daily Health",
+      "Fitness and Mental Wellness"
+    ],
+    paragraphs: [
+      "Health and wellness remain a key priority for modern lifestyles.",
+      "Balanced nutrition and regular exercise contribute to long-term wellbeing.",
+      "Healthcare innovation continues to improve treatment accessibility.",
+      "Mental wellness is increasingly recognized as an essential aspect of health.",
+      "Preventive care helps reduce long-term health risks."
+    ]
+  },
+
+  education: {
+    titles: [
+      "Modern Education Systems",
+      "Digital Learning Platforms",
+      "Future of Online Education",
+      "Academic Growth Strategies",
+      "Learning Technology Trends"
+    ],
+    paragraphs: [
+      "Education continues to evolve with online learning platforms.",
+      "Students benefit from interactive digital tools and flexible access.",
+      "Modern academic systems rely on cloud-based collaboration.",
+      "Technology helps improve both teaching quality and student outcomes.",
+      "Remote learning solutions are becoming increasingly common."
+    ]
+  },
+
+  travel: {
+    titles: [
+      "Best Travel Destinations",
+      "Modern Tourism Trends",
+      "Travel Planning Guide",
+      "Adventure and Lifestyle Travel",
+      "Luxury Destination Experience"
+    ],
+    paragraphs: [
+      "Travel remains one of the most popular lifestyle interests worldwide.",
+      "Modern tourism platforms help users discover destinations faster.",
+      "Digital travel planning tools improve convenience significantly.",
+      "Luxury experiences and adventure tourism continue to grow.",
+      "Travel guides help users make informed decisions."
+    ]
+  },
+
+  finance: {
+    titles: [
+      "Personal Finance Management",
+      "Investment Growth Guide",
+      "Modern Financial Strategies",
+      "Smart Wealth Planning",
+      "Digital Finance Trends"
+    ],
+    paragraphs: [
+      "Financial planning is essential for long-term stability.",
+      "Modern investment tools help users monitor portfolio growth.",
+      "Digital banking systems improve convenience and accessibility.",
+      "Smart budgeting helps individuals reach financial goals.",
+      "Wealth management strategies continue to evolve."
+    ]
+  },
+
+  sports: {
+    titles: [
+      "Latest Sports Updates",
+      "Fitness and Performance",
+      "Athlete Training Guide",
+      "Sports Industry Trends",
+      "Modern Athletic Development"
+    ],
+    paragraphs: [
+      "Sports continue to inspire millions of people globally.",
+      "Modern training systems improve athletic performance.",
+      "Fitness technology supports better performance tracking.",
+      "Professional sports industries continue to expand rapidly.",
+      "Data analytics now plays a major role in sports."
+    ]
+  },
+
+  lifestyle: {
+    titles: [
+      "Modern Lifestyle Trends",
+      "Daily Productivity Guide",
+      "Work-Life Balance Tips",
+      "Personal Growth and Wellness",
+      "Minimalist Living Ideas"
+    ],
+    paragraphs: [
+      "Lifestyle trends continue to evolve with modern work patterns.",
+      "Work-life balance is increasingly important for wellbeing.",
+      "Productivity tools help individuals manage daily tasks.",
+      "Minimalist living remains a growing global trend.",
+      "Personal growth strategies support long-term success."
+    ]
+  },
+
+  marketing: {
+    titles: [
+      "Digital Marketing Trends",
+      "SEO Growth Strategy",
+      "Content Marketing Guide",
+      "Social Media Optimization",
+      "Online Brand Development"
+    ],
+    paragraphs: [
+      "Digital marketing remains essential for modern businesses.",
+      "SEO strategies improve organic visibility and website growth.",
+      "Content marketing helps build authority and trust.",
+      "Social media continues to drive audience engagement.",
+      "Brand development requires consistent messaging and analytics."
+    ]
+  }
+};
 
 function randomFrom(arr){
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function buildRealArticle(){
-  let content = "";
+function buildArticleContent(paragraphs){
+  let html = "";
 
-  content += `<p>${randomFrom(introParagraphs)}</p><br>`;
-
-  for(let i = 0; i < 8; i++){
-    content += `<p>${randomFrom(bodyParagraphs)}</p><br><br>`;
+  for(let i = 0; i < 10; i++){
+    html += `<p>${randomFrom(paragraphs)}</p><br>`;
   }
 
-  content += `<p>${randomFrom(closingParagraphs)}</p>`;
-
-  return content;
+  return html;
 }
 
-const articles = Array.from({ length: 100 }, (_, i) => ({
-  title: `${randomFrom(seoTopics)} ${i + 1}`,
-  content: buildRealArticle()
-}));
+const nicheKeys = Object.keys(niches);
+
+const articles = Array.from({ length: 1000 }, (_, i) => {
+  const niche = niches[randomFrom(nicheKeys)];
+
+  return {
+    title: `${randomFrom(niche.titles)} ${i + 1}`,
+    content: buildArticleContent(niche.paragraphs)
+  };
+});
 
 function getRandomArticle(){
   return articles[Math.floor(Math.random() * articles.length)];
