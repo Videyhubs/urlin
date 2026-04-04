@@ -37,6 +37,9 @@ button{
   cursor:pointer;
   font-weight:bold;
 }
+.delete-btn{
+  background:#ef4444;
+}
 .item{
   background:#020617;
   padding:12px;
@@ -71,7 +74,7 @@ img{
   line-height:1.8;
 }
 .article p{
-  margin:14px 0;
+  margin:16px 0;
   text-align:justify;
 }
 .sticky-cta{
@@ -92,6 +95,11 @@ img{
 .small{
   font-size:12px;
   color:#94a3b8;
+}
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
 }
 </style>
 
@@ -180,6 +188,23 @@ function saveHistory(code,url){
   });
 }
 
+function deleteHistory(code){
+  if(!confirm("Delete this history?")) return;
+
+  db.ref("history/"+code).remove().then(()=>{
+    db.ref("links/"+code).remove();
+    loadAnalysis();
+  });
+}
+
+function clearAllHistory(){
+  if(!confirm("Delete all history?")) return;
+
+  db.ref("history").remove().then(()=>{
+    loadAnalysis();
+  });
+}
+
 function updateClick(code){
   db.ref("history/"+code).transaction(data=>{
     if(data){
@@ -223,11 +248,7 @@ function bulk(){
     db.ref("links/"+code).set({url});
     saveHistory(code,url);
 
-    html += `
-      <div class="item">
-        ${DOMAIN}/#${code}
-      </div>
-    `;
+    html += `<div class="item">${DOMAIN}/#${code}</div>`;
   });
 
   document.getElementById("bulkResult").innerHTML = html;
@@ -247,9 +268,16 @@ function loadAnalysis(){
 
       historyHTML += `
         <div class="item">
-          ${DOMAIN}/#${item.code}<br>
-          Clicks: ${item.clicks || 0}<br>
-          ${item.createdAt}
+          <strong>${DOMAIN}/#${item.code}</strong>
+          <p>Clicks: ${item.clicks || 0}</p>
+          <p>${item.createdAt}</p>
+
+          <div class="actions">
+            <button onclick="copyText('${DOMAIN}/#${item.code}')">Copy</button>
+            <button class="delete-btn" onclick="deleteHistory('${item.code}')">
+              Delete
+            </button>
+          </div>
         </div>
       `;
     });
@@ -268,7 +296,10 @@ function loadAnalysis(){
 
       <div class="card">
         <h2>History</h2>
-        ${historyHTML || "No history yet"}
+        <button class="delete-btn" onclick="clearAllHistory()">
+          Clear All History
+        </button>
+        ${historyHTML || "<p>No history yet</p>"}
       </div>
     `;
   });
@@ -327,9 +358,7 @@ function redirectPage(target,code){
           </small>
 
           <h2>${article.title}</h2>
-
           <small>/${article.slug}</small>
-
           <p><i>${article.metaDescription}</i></p>
 
           <img src="https://picsum.photos/900/400?${Date.now()}">
