@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URLIN Shortin</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
+.container{max-width:900px;margin:auto;padding:20px}
+.card{background:#111827;padding:20px;border-radius:15px;margin-top:20px;text-align:center}
+input,textarea,button{padding:12px;margin:8px;border-radius:10px;border:none}
+input,textarea{width:100%}
+button{background:#22c55e;color:#fff;cursor:pointer}
+.item{background:#020617;padding:10px;border-radius:10px;margin-top:10px;word-break:break-all}
+img{max-width:100%;border-radius:10px;margin:15px 0}
+.loader{margin:20px auto;width:60px;height:60px;border-radius:50%;border:5px solid #1f2937;border-top:5px solid #22c55e;animation:spin 1s linear infinite}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+.center{display:flex;flex-direction:column;align-items:center}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+
+// FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyBzGiN1aokAnaXHVF38ahFVAdHqSf5n8QY",
+  authDomain: "urlin-shortin.firebaseapp.com",
+  databaseURL: "https://urlin-shortin-default-rtdb.firebaseio.com",
+  projectId: "urlin-shortin",
+  storageBucket: "urlin-shortin.firebasestorage.app",
+  messagingSenderId: "401542928080",
+  appId: "1:401542928080:web:53d4d79b7b76eb6141b0d5"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// CONFIG
+const DOMAIN = "https://urlin.biz.id";
+const PIN = "270491";
+
+// PIN SYSTEM
+function showPin(){
+  app.innerHTML = `
+  <div class='container'><div class='card'>
+  <h2>Enter PIN</h2>
+  <input id='pin' type='password'>
+  <button onclick='login()'>Unlock</button>
+  </div></div>`;
+}
+
+function login(){
+  if(pin.value===PIN){
+    localStorage.setItem('urlin_pin',PIN);
+    dashboard();
+  } else alert('Wrong PIN');
+}
+
+function isLogin(){
+  return localStorage.getItem('urlin_pin')===PIN;
+}
+
+// UTIL
+function normalize(u){
+  return /^https?:\/\//i.test(u)?u:"https://"+u;
+}
+
+function randomCode(){
+  return Math.random().toString(36).substring(2,6);
+}
+
+function copy(t){
+  navigator.clipboard.writeText(t);
+  alert('Copied');
+}
+
+// ARTICLE
+function getArticle(){
+  const img = "https://picsum.photos/800/400?"+Math.random();
+  return `
+  <h2>Get Video Downloader & Player</h2>
+  <img src="${img}">
+  <p>
+  Modern video downloader and player tools allow users to save and watch content offline efficiently. These tools support multiple formats such as MP4, MKV, and AVI while offering high-definition playback.<br><br>Advanced features like subtitle synchronization and hardware acceleration ensure smooth performance across all devices.
+  </p>`;
+}
+
+// GENERATE
+function generate(){
+  let url = document.getElementById('url').value;
+  if(!url) return alert('Enter URL');
+
+  url = normalize(url);
+  let code = randomCode();
+
+  db.ref('links/'+code).set({url:url});
+
+  const short = DOMAIN + '/#' + code;
+
+  document.getElementById('result').innerHTML = `
+  <div class='item'>${short}<br>
+  <button onclick="copy('${short}')">Copy</button>
+  </div>`;
+}
+
+function bulk(){
+  const list = document.getElementById('bulk').value.split("\n").filter(x=>x.trim());
+  let html="";
+
+  list.forEach(u=>{
+    let url = normalize(u);
+    let code = randomCode();
+
+    db.ref('links/'+code).set({url:url});
+
+    const short = DOMAIN + '/#' + code;
+
+    html += `<div class='item'>${short}<br><button onclick="copy('${short}')">Copy</button></div>`;
+  });
+
+  document.getElementById('bulkResult').innerHTML = html;
+}
+
+// DASHBOARD
+function dashboard(){
+  app.innerHTML = `
+  <div class='container'>
+
+    <div class='card'>
+      <h2>Create Shortlink</h2>
+      <input id='url' placeholder='Enter URL'>
+      <button onclick='generate()'>Generate</button>
+      <div id='result'></div>
+    </div>
+
+    <div class='card'>
+      <h2>Bulk Generator</h2>
+      <textarea id='bulk'></textarea>
+      <button onclick='bulk()'>Generate Bulk</button>
+      <div id='bulkResult'></div>
+    </div>
+
+  </div>`;
+}
+
+// REDIRECT
+function redirectPage(target){
+  const delay = Math.floor(Math.random()*3)+5;
+
+  app.innerHTML = `
+  <div class='container'>
+    <div class='card'>
+      ${getArticle()}
+      <div class='center'>
+        <div class='loader'></div>
+        <p id='count'></p>
+        <a href='https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i' target='_blank'>
+          <button>Join WhatsApp</button>
+        </a>
+      </div>
+    </div>
+  </div>`;
+
+  let t = delay;
+  const timer = setInterval(()=>{
+    document.getElementById('count').innerText = "Redirect in " + t + " sec";
+    t--;
+    if(t<0){ clearInterval(timer); window.location.replace(target); }
+  },300);
+}
+
+// ROUTER
+window.onload = ()=>{
+  const code = location.hash.replace('#','');
+
+  if(code){
+    db.ref('links/'+code).once('value').then(snap=>{
+      const data = snap.val();
+
+      if(data && data.url){
+        redirectPage(data.url);
+      } else {
+        document.body.innerHTML = "<h2 style='text-align:center'>Link not found</h2>";
+      }
+    });
+    return;
+  }
+
+  if(isLogin()) dashboard(); else showPin();
+}
+
+</script>
+</body>
+</html>
