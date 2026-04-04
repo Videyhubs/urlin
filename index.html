@@ -34,7 +34,8 @@ input,textarea,button{
 button{
   background:#22c55e;
   color:#fff;
-  cursor:pointer
+  cursor:pointer;
+  font-weight:bold
 }
 .item{
   background:#020617;
@@ -80,11 +81,22 @@ img{
   color:#94a3b8
 }
 .article{
-  line-height:1.9;
+  line-height:1.9
 }
 .article p{
-  text-align:justify;
-  margin:0;
+  text-align:justify
+}
+.sticky-cta{
+  position:sticky;
+  bottom:15px;
+  z-index:999;
+  margin-top:20px;
+  animation:pulse 1.5s infinite
+}
+@keyframes pulse{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.02)}
+  100%{transform:scale(1)}
 }
 </style>
 
@@ -111,6 +123,22 @@ const db = firebase.database();
 
 const DOMAIN = "https://urlin.biz.id";
 const PIN = "270491";
+
+function getRedirectTime(){
+  return parseInt(localStorage.getItem("redirect_time")) || 5;
+}
+
+function saveRedirectTime(){
+  const value = parseInt(document.getElementById("redirectTime").value);
+
+  if(!value || value < 1){
+    alert("Minimum 1 second");
+    return;
+  }
+
+  localStorage.setItem("redirect_time", value);
+  alert("Saved");
+}
 
 function normalize(url){
   return /^https?:\/\//i.test(url) ? url : "https://" + url;
@@ -246,6 +274,13 @@ function dashboard(){
         <div id="bulkResult"></div>
       </div>
 
+      <div class="card">
+        <h2>Redirect Settings</h2>
+        <input id="redirectTime" type="number" min="1"
+          value="${getRedirectTime()}">
+        <button onclick="saveRedirectTime()">Save</button>
+      </div>
+
       <div id="analysis"></div>
     </div>
   `;
@@ -256,16 +291,39 @@ function dashboard(){
 function redirectPage(target,code){
   updateClick(code);
 
-  let sec = 3;
+  let sec = getRedirectTime();
   const article = getRandomArticle();
 
   app.innerHTML = `
     <div class="container">
       <div class="card">
         <div class="article">
+          <small>
+            ${article.category.toUpperCase()} •
+            ${article.publishDate} •
+            ${article.author} •
+            ${article.readTime}
+          </small>
+
           <h2>${article.title}</h2>
+
+          <small>/${article.slug}</small>
+
+          <p><i>${article.metaDescription}</i></p>
+
           <img src="https://picsum.photos/900/400?${Math.random()}">
+
           ${article.content}
+
+          <div class="sticky-cta">
+            <a href="https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i"
+               target="_blank"
+               style="text-decoration:none">
+              <button>
+                Join WhatsApp Channel
+              </button>
+            </a>
+          </div>
         </div>
 
         <div class="center">
@@ -284,7 +342,7 @@ function redirectPage(target,code){
       clearInterval(timer);
       window.location.replace(target);
     }
-  },500);
+  },1000);
 }
 
 window.onload = ()=>{
