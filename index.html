@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>URLIN Shortin Pro</title>
+<title>URLIN Shortin</title>
 
 <style>
 body{
   margin:0;
   font-family:Arial,sans-serif;
   background:#0b1220;
-  color:#fff
+  color:#fff;
 }
 .container{
   max-width:1000px;
   margin:auto;
-  padding:20px
+  padding:20px;
 }
 .card{
   background:#111827;
   padding:20px;
   border-radius:15px;
-  margin-top:20px
+  margin-top:20px;
 }
 input,textarea,button{
   width:100%;
@@ -29,25 +29,25 @@ input,textarea,button{
   margin:8px 0;
   border:none;
   border-radius:10px;
-  box-sizing:border-box
+  box-sizing:border-box;
 }
 button{
   background:#22c55e;
   color:#fff;
   cursor:pointer;
-  font-weight:bold
+  font-weight:bold;
 }
 .item{
   background:#020617;
   padding:12px;
   border-radius:10px;
   margin-top:10px;
-  word-break:break-all
+  word-break:break-all;
 }
 img{
   max-width:100%;
   border-radius:10px;
-  margin:15px 0
+  margin:15px 0;
 }
 .loader{
   margin:20px auto;
@@ -56,7 +56,7 @@ img{
   border:5px solid #1f2937;
   border-top:5px solid #22c55e;
   border-radius:50%;
-  animation:spin 1s linear infinite
+  animation:spin 1s linear infinite;
 }
 @keyframes spin{
   0%{transform:rotate(0)}
@@ -65,38 +65,19 @@ img{
 .center{
   display:flex;
   flex-direction:column;
-  align-items:center
-}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:20px
-}
-.stat{
-  font-size:24px;
-  font-weight:bold
-}
-.small{
-  font-size:12px;
-  color:#94a3b8
+  align-items:center;
 }
 .article{
-  line-height:1.9
+  line-height:1.9;
 }
 .article p{
-  text-align:justify
+  text-align:justify;
 }
 .sticky-cta{
   position:sticky;
   bottom:15px;
   z-index:999;
   margin-top:20px;
-  animation:pulse 1.5s infinite
-}
-@keyframes pulse{
-  0%{transform:scale(1)}
-  50%{transform:scale(1.02)}
-  100%{transform:scale(1)}
 }
 </style>
 
@@ -108,6 +89,8 @@ img{
 <div id="app"></div>
 
 <script>
+const app = document.getElementById("app");
+
 const firebaseConfig = {
   apiKey: "AIzaSyBzGiN1aokAnaXHVF38ahFVAdHqSf5n8QY",
   authDomain: "urlin-shortin.firebaseapp.com",
@@ -125,7 +108,7 @@ const DOMAIN = "https://urlin.biz.id";
 const PIN = "270491";
 
 function getRedirectTime(){
-  return parseInt(localStorage.getItem("redirect_time")) || 5;
+  return parseInt(localStorage.getItem("redirect_time")) || 3;
 }
 
 function saveRedirectTime(){
@@ -154,8 +137,9 @@ function copyText(text){
 }
 
 function login(){
-  if(pin.value===PIN){
-    localStorage.setItem("pin",PIN);
+  const pinInput = document.getElementById("pin");
+  if(pinInput.value === PIN){
+    localStorage.setItem("pin", PIN);
     dashboard();
   }else{
     alert("Wrong PIN");
@@ -163,7 +147,7 @@ function login(){
 }
 
 function isLogin(){
-  return localStorage.getItem("pin")===PIN;
+  return localStorage.getItem("pin") === PIN;
 }
 
 function showPin(){
@@ -178,83 +162,23 @@ function showPin(){
   `;
 }
 
-function saveHistory(code,url){
-  db.ref("history/"+code).set({
-    code,url,
-    clicks:0,
-    createdAt:new Date().toLocaleString()
-  });
-}
-
 function generate(){
-  let url = urlInput.value.trim();
+  const input = document.getElementById("urlInput");
+  let url = input.value.trim();
+
   if(!url) return alert("Enter URL");
 
   url = normalize(url);
   const code = randomCode();
 
-  db.ref("links/"+code).set({url});
-  saveHistory(code,url);
+  db.ref("links/" + code).set({ url });
 
-  result.innerHTML = `
+  document.getElementById("result").innerHTML = `
     <div class="item">
       ${DOMAIN}/#${code}
       <button onclick="copyText('${DOMAIN}/#${code}')">Copy</button>
     </div>
   `;
-
-  loadAnalysis();
-}
-
-function bulk(){
-  const lines = bulkInput.value.split("\n").filter(x=>x.trim());
-  let html = "";
-
-  lines.forEach(link=>{
-    const code = randomCode();
-    const url = normalize(link);
-
-    db.ref("links/"+code).set({url});
-    saveHistory(code,url);
-
-    html += `<div class="item">${DOMAIN}/#${code}</div>`;
-  });
-
-  bulkResult.innerHTML = html;
-  loadAnalysis();
-}
-
-function loadAnalysis(){
-  db.ref("history").once("value").then(snap=>{
-    const data = snap.val() || {};
-    let totalLinks = 0;
-    let totalClicks = 0;
-
-    Object.values(data).forEach(x=>{
-      totalLinks++;
-      totalClicks += x.clicks || 0;
-    });
-
-    analysis.innerHTML = `
-      <div class="grid">
-        <div class="card">
-          <div class="stat">${totalLinks}</div>
-          <div class="small">Total Links</div>
-        </div>
-        <div class="card">
-          <div class="stat">${totalClicks}</div>
-          <div class="small">Total Clicks</div>
-        </div>
-      </div>
-    `;
-  });
-}
-
-function updateClick(code){
-  db.ref("history/"+code).transaction(data=>{
-    if(data) data.clicks = (data.clicks || 0)+1;
-    return data;
-  });
 }
 
 function dashboard(){
@@ -268,28 +192,19 @@ function dashboard(){
       </div>
 
       <div class="card">
-        <h2>Bulk Generator</h2>
-        <textarea id="bulkInput" rows="5"></textarea>
-        <button onclick="bulk()">Generate Bulk</button>
-        <div id="bulkResult"></div>
-      </div>
-
-      <div class="card">
-        <h2>Redirect Settings</h2>
-        <input id="redirectTime" type="number" min="1"
-          value="${getRedirectTime()}">
+        <h2>Redirect Time</h2>
+        <input id="redirectTime" type="number" min="1" value="${getRedirectTime()}">
         <button onclick="saveRedirectTime()">Save</button>
       </div>
-
-      <div id="analysis"></div>
     </div>
   `;
-
-  loadAnalysis();
 }
 
-function redirectPage(target,code){
-  updateClick(code);
+function redirectPage(target){
+  if(!target){
+    app.innerHTML = "<h2 style='text-align:center'>Invalid target URL</h2>";
+    return;
+  }
 
   let sec = getRedirectTime();
   const article = getRandomArticle();
@@ -311,60 +226,70 @@ function redirectPage(target,code){
 
           <p><i>${article.metaDescription}</i></p>
 
-          <img src="https://picsum.photos/900/400?${Math.random()}">
+          <img src="https://picsum.photos/900/400?random=${Date.now()}">
 
           ${article.content}
 
           <div class="sticky-cta">
-            <a href="https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i"
-               target="_blank"
-               style="text-decoration:none">
-              <button>
-                Join WhatsApp Channel
-              </button>
+            <a href="https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i" target="_blank">
+              <button>Join WhatsApp Channel</button>
             </a>
           </div>
         </div>
 
         <div class="center">
           <div class="loader"></div>
-          <p id="count"></p>
+          <p id="count">Redirect in ${sec} sec</p>
         </div>
       </div>
     </div>
   `;
 
+  const countEl = document.getElementById("count");
+
   const timer = setInterval(()=>{
-    count.innerText = "Redirect in " + sec + " sec";
     sec--;
 
-    if(sec < 0){
+    if(countEl){
+      countEl.innerText = "Redirect in " + sec + " sec";
+    }
+
+    if(sec <= 0){
       clearInterval(timer);
-      window.location.replace(target);
+
+      try{
+        window.location.href = target;
+      }catch(e){
+        app.innerHTML = "<h2 style='text-align:center'>Redirect failed</h2>";
+      }
     }
   },1000);
 }
 
-window.onload = ()=>{
+window.onload = function(){
   const code = location.hash.replace("#","");
 
   if(code){
-    db.ref("links/"+code).once("value").then(snap=>{
-      const data = snap.val();
+    db.ref("links/" + code).once("value")
+      .then(snapshot=>{
+        const data = snapshot.val();
 
-      if(data && data.url){
-        redirectPage(data.url,code);
-      }else{
-        document.body.innerHTML =
-          "<h2 style='text-align:center'>Link not found</h2>";
-      }
-    });
+        if(data && data.url){
+          redirectPage(data.url);
+        }else{
+          app.innerHTML = "<h2 style='text-align:center'>Link not found</h2>";
+        }
+      })
+      .catch(()=>{
+        app.innerHTML = "<h2 style='text-align:center'>Error loading link</h2>";
+      });
+
     return;
   }
 
   if(isLogin()) dashboard();
   else showPin();
-}
+};
 </script>
 </body>
 </html>
