@@ -1,33 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>URLIN Shortin</title>
-
-<style>
-body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
-.container{max-width:900px;margin:auto;padding:20px}
-.card{background:#111827;padding:20px;border-radius:15px;margin-top:20px;text-align:center}
-input,textarea,button{padding:12px;margin:8px;border-radius:10px;border:none}
-input,textarea{width:100%}
-button{background:#22c55e;color:#fff;cursor:pointer}
-.item{background:#020617;padding:10px;border-radius:10px;margin-top:10px;word-break:break-all}
-img{max-width:100%;border-radius:10px;margin:15px 0}
-.loader{margin:20px auto;width:60px;height:60px;border-radius:50%;border:5px solid #1f2937;border-top:5px solid #22c55e;animation:spin 1s linear infinite}
-@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
-.center{display:flex;flex-direction:column;align-items:center}
-</style>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
-</head>
-<body>
-<div id="app"></div>
-
 <script>
-
 // FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyBzGiN1aokAnaXHVF38ahFVAdHqSf5n8QY",
@@ -42,11 +13,10 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// CONFIG
 const DOMAIN = "https://urlin.biz.id";
 const PIN = "270491";
 
-// PIN SYSTEM
+// LOGIN
 function showPin(){
   app.innerHTML = `
   <div class='container'><div class='card'>
@@ -81,15 +51,61 @@ function copy(t){
   alert('Copied');
 }
 
-// ARTICLE
+// RANDOM ARTICLE SYSTEM
+const articles = [
+  {
+    title: "Fast Video Downloader Online",
+    text: "Download videos instantly in HD quality with support for MP4, AVI, and MKV formats."
+  },
+  {
+    title: "Best Media Player Experience",
+    text: "Enjoy smooth playback, subtitle sync, and full-screen viewing on all devices."
+  },
+  {
+    title: "Watch & Save Videos Easily",
+    text: "Modern downloader tools now support fast cloud delivery and instant streaming."
+  },
+  {
+    title: "Unlimited Video Access",
+    text: "Save content offline and enjoy playback anytime without buffering."
+  },
+  {
+    title: "Secure Video Streaming",
+    text: "Advanced streaming technology ensures safe and fast viewing experience."
+  }
+];
+
 function getArticle(){
-  const img = "https://picsum.photos/800/400?"+Math.random();
+  const item = articles[Math.floor(Math.random()*articles.length)];
+  const img = "https://picsum.photos/800/400?" + Math.random();
+
   return `
-  <h2>Get Video Downloader & Player</h2>
-  <img src="${img}">
-  <p>
-  Modern video downloader and player tools allow users to save and watch content offline efficiently. These tools support multiple formats such as MP4, MKV, and AVI while offering high-definition playback.<br><br>Advanced features like subtitle synchronization and hardware acceleration ensure smooth performance across all devices.
-  </p>`;
+    <h2>${item.title}</h2>
+    <img src="${img}">
+    <p>${item.text}</p>
+  `;
+}
+
+// SAVE HISTORY
+function saveHistory(code,url){
+  const time = new Date().toLocaleString();
+
+  db.ref('history/' + code).set({
+    code,
+    url,
+    createdAt: time,
+    clicks: 0
+  });
+}
+
+// UPDATE ANALYTICS
+function addClick(code){
+  db.ref('history/' + code).transaction(data=>{
+    if(!data) return null;
+    data.clicks = (data.clicks || 0) + 1;
+    data.lastClick = new Date().toLocaleString();
+    return data;
+  });
 }
 
 // GENERATE
@@ -101,6 +117,7 @@ function generate(){
   let code = randomCode();
 
   db.ref('links/'+code).set({url:url});
+  saveHistory(code,url);
 
   const short = DOMAIN + '/#' + code;
 
@@ -108,10 +125,15 @@ function generate(){
   <div class='item'>${short}<br>
   <button onclick="copy('${short}')">Copy</button>
   </div>`;
+
+  loadAnalysis();
 }
 
 function bulk(){
-  const list = document.getElementById('bulk').value.split("\n").filter(x=>x.trim());
+  const list = document.getElementById('bulk').value
+    .split("\n")
+    .filter(x=>x.trim());
+
   let html="";
 
   list.forEach(u=>{
@@ -119,13 +141,48 @@ function bulk(){
     let code = randomCode();
 
     db.ref('links/'+code).set({url:url});
+    saveHistory(code,url);
 
     const short = DOMAIN + '/#' + code;
 
-    html += `<div class='item'>${short}<br><button onclick="copy('${short}')">Copy</button></div>`;
+    html += `
+      <div class='item'>
+        ${short}<br>
+        <button onclick="copy('${short}')">Copy</button>
+      </div>`;
   });
 
   document.getElementById('bulkResult').innerHTML = html;
+  loadAnalysis();
+}
+
+// ANALYSIS
+function loadAnalysis(){
+  db.ref('history').once('value').then(snap=>{
+    const data = snap.val() || {};
+    let totalLinks = 0;
+    let totalClicks = 0;
+    let html = "";
+
+    Object.values(data).forEach(item=>{
+      totalLinks++;
+      totalClicks += item.clicks || 0;
+
+      html += `
+      <div class='item'>
+        <b>${item.code}</b><br>
+        URL: ${item.url}<br>
+        Clicks: ${item.clicks || 0}<br>
+        Created: ${item.createdAt}
+      </div>`;
+    });
+
+    document.getElementById('analysis').innerHTML = `
+      <h3>Total Links: ${totalLinks}</h3>
+      <h3>Total Clicks: ${totalClicks}</h3>
+      ${html}
+    `;
+  });
 }
 
 // DASHBOARD
@@ -147,11 +204,20 @@ function dashboard(){
       <div id='bulkResult'></div>
     </div>
 
+    <div class='card'>
+      <h2>History & Analysis</h2>
+      <div id='analysis'></div>
+    </div>
+
   </div>`;
+
+  loadAnalysis();
 }
 
 // REDIRECT
-function redirectPage(target){
+function redirectPage(target,code){
+  addClick(code);
+
   const delay = Math.floor(Math.random()*3)+5;
 
   app.innerHTML = `
@@ -161,18 +227,20 @@ function redirectPage(target){
       <div class='center'>
         <div class='loader'></div>
         <p id='count'></p>
-        <a href='https://whatsapp.com/channel/0029VbDTbKN4CrfZ5GOmdY0i' target='_blank'>
-          <button>Join WhatsApp</button>
-        </a>
       </div>
     </div>
   </div>`;
 
   let t = delay;
   const timer = setInterval(()=>{
-    document.getElementById('count').innerText = "Redirect in " + t + " sec";
+    document.getElementById('count').innerText =
+      "Redirect in " + t + " sec";
     t--;
-    if(t<0){ clearInterval(timer); window.location.replace(target); }
+
+    if(t<0){
+      clearInterval(timer);
+      window.location.replace(target);
+    }
   },300);
 }
 
@@ -185,17 +253,16 @@ window.onload = ()=>{
       const data = snap.val();
 
       if(data && data.url){
-        redirectPage(data.url);
+        redirectPage(data.url,code);
       } else {
-        document.body.innerHTML = "<h2 style='text-align:center'>Link not found</h2>";
+        document.body.innerHTML =
+          "<h2 style='text-align:center'>Link not found</h2>";
       }
     });
     return;
   }
 
-  if(isLogin()) dashboard(); else showPin();
+  if(isLogin()) dashboard();
+  else showPin();
 }
-
 </script>
-</body>
-</html>
