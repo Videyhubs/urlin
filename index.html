@@ -1,5 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URLIN Shortin Pro</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#0b1220;color:#fff}
+.container{max-width:1000px;margin:auto;padding:20px}
+.card{background:#111827;padding:20px;border-radius:15px;margin-top:20px}
+input,textarea,button{
+  padding:12px;
+  margin:8px 0;
+  border-radius:10px;
+  border:none;
+  width:100%;
+  box-sizing:border-box
+}
+button{background:#22c55e;color:#fff;cursor:pointer}
+.item{
+  background:#020617;
+  padding:12px;
+  border-radius:10px;
+  margin-top:10px;
+  word-break:break-all
+}
+img{max-width:100%;border-radius:10px;margin:15px 0}
+.loader{
+  margin:20px auto;
+  width:60px;height:60px;
+  border-radius:50%;
+  border:5px solid #1f2937;
+  border-top:5px solid #22c55e;
+  animation:spin 1s linear infinite
+}
+@keyframes spin{
+  0%{transform:rotate(0)}
+  100%{transform:rotate(360deg)}
+}
+.center{display:flex;flex-direction:column;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.stat{font-size:20px;font-weight:bold}
+.small{font-size:12px;color:#94a3b8}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+</head>
+<body>
+<div id="app"></div>
+
 <script>
-// FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyBzGiN1aokAnaXHVF38ahFVAdHqSf5n8QY",
   authDomain: "urlin-shortin.firebaseapp.com",
@@ -16,247 +67,293 @@ const db = firebase.database();
 const DOMAIN = "https://urlin.biz.id";
 const PIN = "270491";
 
-// LOGIN
-function showPin(){
-  app.innerHTML = `
-  <div class='container'><div class='card'>
-  <h2>Enter PIN</h2>
-  <input id='pin' type='password'>
-  <button onclick='login()'>Unlock</button>
-  </div></div>`;
+const articles = [
+  "Fast HD video downloader with unlimited speed and secure streaming.",
+  "Watch premium video content online with smooth playback and offline mode.",
+  "Save videos instantly and enjoy ultra-fast cloud delivery system.",
+  "Advanced player with subtitle sync and adaptive streaming quality.",
+  "High-speed shortlink redirect with optimized content monetization.",
+  "Premium media access with fast countdown redirect technology.",
+  "Unlimited access to entertainment and video resources.",
+  "Smart redirect engine with dynamic article rotation."
+];
+
+function randomArticle(){
+  return articles[Math.floor(Math.random()*articles.length)];
+}
+
+function randomImage(){
+  return "https://picsum.photos/900/400?" + Math.random();
+}
+
+function normalize(url){
+  return /^https?:\/\//i.test(url) ? url : "https://" + url;
+}
+
+function randomCode(){
+  return Math.random().toString(36).substring(2,7);
+}
+
+function generateUniqueCode(callback){
+  const code = randomCode();
+
+  db.ref("links/" + code).once("value").then(snap=>{
+    if(snap.exists()){
+      generateUniqueCode(callback);
+    }else{
+      callback(code);
+    }
+  });
+}
+
+function copyText(text){
+  navigator.clipboard.writeText(text);
+  alert("Copied");
 }
 
 function login(){
   if(pin.value===PIN){
-    localStorage.setItem('urlin_pin',PIN);
+    localStorage.setItem("pin",PIN);
     dashboard();
-  } else alert('Wrong PIN');
+  }else{
+    alert("Wrong PIN");
+  }
 }
 
 function isLogin(){
-  return localStorage.getItem('urlin_pin')===PIN;
+  return localStorage.getItem("pin")===PIN;
 }
 
-// UTIL
-function normalize(u){
-  return /^https?:\/\//i.test(u)?u:"https://"+u;
-}
-
-function randomCode(){
-  return Math.random().toString(36).substring(2,6);
-}
-
-function copy(t){
-  navigator.clipboard.writeText(t);
-  alert('Copied');
-}
-
-// RANDOM ARTICLE SYSTEM
-const articles = [
-  {
-    title: "Fast Video Downloader Online",
-    text: "Download videos instantly in HD quality with support for MP4, AVI, and MKV formats."
-  },
-  {
-    title: "Best Media Player Experience",
-    text: "Enjoy smooth playback, subtitle sync, and full-screen viewing on all devices."
-  },
-  {
-    title: "Watch & Save Videos Easily",
-    text: "Modern downloader tools now support fast cloud delivery and instant streaming."
-  },
-  {
-    title: "Unlimited Video Access",
-    text: "Save content offline and enjoy playback anytime without buffering."
-  },
-  {
-    title: "Secure Video Streaming",
-    text: "Advanced streaming technology ensures safe and fast viewing experience."
-  }
-];
-
-function getArticle(){
-  const item = articles[Math.floor(Math.random()*articles.length)];
-  const img = "https://picsum.photos/800/400?" + Math.random();
-
-  return `
-    <h2>${item.title}</h2>
-    <img src="${img}">
-    <p>${item.text}</p>
+function showPin(){
+  app.innerHTML = `
+    <div class="container">
+      <div class="card">
+        <h2>Enter PIN</h2>
+        <input id="pin" type="password">
+        <button onclick="login()">Unlock</button>
+      </div>
+    </div>
   `;
 }
 
-// SAVE HISTORY
-function saveHistory(code,url){
-  const time = new Date().toLocaleString();
-
-  db.ref('history/' + code).set({
+function saveHistory(code,url,type="single"){
+  db.ref("history/"+code).set({
     code,
     url,
-    createdAt: time,
-    clicks: 0
+    type,
+    clicks:0,
+    createdAt:new Date().toLocaleString()
   });
 }
 
-// UPDATE ANALYTICS
-function addClick(code){
-  db.ref('history/' + code).transaction(data=>{
-    if(!data) return null;
-    data.clicks = (data.clicks || 0) + 1;
-    data.lastClick = new Date().toLocaleString();
+function generate(){
+  let url = urlInput.value.trim();
+  if(!url) return alert("Enter URL");
+
+  url = normalize(url);
+
+  generateUniqueCode(code=>{
+    db.ref("links/"+code).set({url});
+
+    saveHistory(code,url,"single");
+
+    const short = DOMAIN + "/#" + code;
+
+    result.innerHTML = `
+      <div class="item">
+        ${short}
+        <button onclick="copyText('${short}')">Copy</button>
+      </div>
+    `;
+
+    loadAnalysis();
+  });
+}
+
+function bulk(){
+  const lines = bulkInput.value.split("\n").filter(x=>x.trim());
+  let html = "";
+
+  lines.forEach(link=>{
+    const url = normalize(link.trim());
+
+    generateUniqueCode(code=>{
+      db.ref("links/"+code).set({url});
+      saveHistory(code,url,"bulk");
+
+      const short = DOMAIN + "/#" + code;
+
+      html += `
+        <div class="item">
+          ${short}
+          <button onclick="copyText('${short}')">Copy</button>
+        </div>
+      `;
+
+      bulkResult.innerHTML = html;
+      loadAnalysis();
+    });
+  });
+}
+
+function updateClick(code){
+  db.ref("history/"+code).transaction(data=>{
+    if(data){
+      data.clicks = (data.clicks||0)+1;
+      data.lastClick = new Date().toLocaleString();
+    }
     return data;
   });
 }
 
-// GENERATE
-function generate(){
-  let url = document.getElementById('url').value;
-  if(!url) return alert('Enter URL');
-
-  url = normalize(url);
-  let code = randomCode();
-
-  db.ref('links/'+code).set({url:url});
-  saveHistory(code,url);
-
-  const short = DOMAIN + '/#' + code;
-
-  document.getElementById('result').innerHTML = `
-  <div class='item'>${short}<br>
-  <button onclick="copy('${short}')">Copy</button>
-  </div>`;
-
+function deleteHistory(code){
+  db.ref("history/"+code).remove();
+  db.ref("links/"+code).remove();
   loadAnalysis();
 }
 
-function bulk(){
-  const list = document.getElementById('bulk').value
-    .split("\n")
-    .filter(x=>x.trim());
+function exportHistory(){
+  db.ref("history").once("value").then(snap=>{
+    const data = JSON.stringify(snap.val(),null,2);
+    const blob = new Blob([data],{type:"application/json"});
+    const url = URL.createObjectURL(blob);
 
-  let html="";
-
-  list.forEach(u=>{
-    let url = normalize(u);
-    let code = randomCode();
-
-    db.ref('links/'+code).set({url:url});
-    saveHistory(code,url);
-
-    const short = DOMAIN + '/#' + code;
-
-    html += `
-      <div class='item'>
-        ${short}<br>
-        <button onclick="copy('${short}')">Copy</button>
-      </div>`;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "history.json";
+    a.click();
   });
-
-  document.getElementById('bulkResult').innerHTML = html;
-  loadAnalysis();
 }
 
-// ANALYSIS
 function loadAnalysis(){
-  db.ref('history').once('value').then(snap=>{
+  db.ref("history").once("value").then(snap=>{
     const data = snap.val() || {};
+
     let totalLinks = 0;
     let totalClicks = 0;
+    let top = [];
     let html = "";
 
     Object.values(data).forEach(item=>{
       totalLinks++;
       totalClicks += item.clicks || 0;
+      top.push(item);
 
       html += `
-      <div class='item'>
-        <b>${item.code}</b><br>
-        URL: ${item.url}<br>
-        Clicks: ${item.clicks || 0}<br>
-        Created: ${item.createdAt}
-      </div>`;
+        <div class="item">
+          <b>${item.code}</b><br>
+          ${item.url}<br>
+          Type: ${item.type}<br>
+          Clicks: ${item.clicks || 0}<br>
+          Created: ${item.createdAt}<br>
+          <button onclick="deleteHistory('${item.code}')">Delete</button>
+        </div>
+      `;
     });
 
-    document.getElementById('analysis').innerHTML = `
-      <h3>Total Links: ${totalLinks}</h3>
-      <h3>Total Clicks: ${totalClicks}</h3>
-      ${html}
+    top.sort((a,b)=>(b.clicks||0)-(a.clicks||0));
+
+    analysis.innerHTML = `
+      <div class="grid">
+        <div class="card">
+          <div class="stat">${totalLinks}</div>
+          <div class="small">Total Links</div>
+        </div>
+        <div class="card">
+          <div class="stat">${totalClicks}</div>
+          <div class="small">Total Clicks</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Top Clicked</h3>
+        ${(top[0]) ? `
+          <div class="item">
+            ${top[0].code}<br>
+            Clicks: ${top[0].clicks || 0}
+          </div>
+        ` : "No data"}
+      </div>
+
+      <div class="card">
+        <h3>Full History</h3>
+        ${html}
+      </div>
     `;
   });
 }
 
-// DASHBOARD
 function dashboard(){
   app.innerHTML = `
-  <div class='container'>
+    <div class="container">
 
-    <div class='card'>
-      <h2>Create Shortlink</h2>
-      <input id='url' placeholder='Enter URL'>
-      <button onclick='generate()'>Generate</button>
-      <div id='result'></div>
+      <div class="card">
+        <h2>Create Shortlink</h2>
+        <input id="urlInput" placeholder="Enter URL">
+        <button onclick="generate()">Generate</button>
+        <div id="result"></div>
+      </div>
+
+      <div class="card">
+        <h2>Bulk Generator</h2>
+        <textarea id="bulkInput" rows="6"></textarea>
+        <button onclick="bulk()">Generate Bulk</button>
+        <div id="bulkResult"></div>
+      </div>
+
+      <div class="card">
+        <button onclick="exportHistory()">Export JSON</button>
+      </div>
+
+      <div id="analysis"></div>
+
     </div>
-
-    <div class='card'>
-      <h2>Bulk Generator</h2>
-      <textarea id='bulk'></textarea>
-      <button onclick='bulk()'>Generate Bulk</button>
-      <div id='bulkResult'></div>
-    </div>
-
-    <div class='card'>
-      <h2>History & Analysis</h2>
-      <div id='analysis'></div>
-    </div>
-
-  </div>`;
+  `;
 
   loadAnalysis();
 }
 
-// REDIRECT
 function redirectPage(target,code){
-  addClick(code);
+  updateClick(code);
 
-  const delay = Math.floor(Math.random()*3)+5;
+  let sec = Math.floor(Math.random()*3)+5;
 
   app.innerHTML = `
-  <div class='container'>
-    <div class='card'>
-      ${getArticle()}
-      <div class='center'>
-        <div class='loader'></div>
-        <p id='count'></p>
+    <div class="container">
+      <div class="card">
+        <h2>Premium Video Access</h2>
+        <img src="${randomImage()}">
+        <p>${randomArticle()}</p>
+        <div class="center">
+          <div class="loader"></div>
+          <p id="count"></p>
+        </div>
       </div>
     </div>
-  </div>`;
+  `;
 
-  let t = delay;
   const timer = setInterval(()=>{
-    document.getElementById('count').innerText =
-      "Redirect in " + t + " sec";
-    t--;
+    count.innerText = "Redirect in " + sec + " sec";
+    sec--;
 
-    if(t<0){
+    if(sec < 0){
       clearInterval(timer);
       window.location.replace(target);
     }
-  },300);
+  },1000);
 }
 
-// ROUTER
 window.onload = ()=>{
-  const code = location.hash.replace('#','');
+  const code = location.hash.replace("#","");
 
   if(code){
-    db.ref('links/'+code).once('value').then(snap=>{
+    db.ref("links/"+code).once("value").then(snap=>{
       const data = snap.val();
 
       if(data && data.url){
         redirectPage(data.url,code);
-      } else {
-        document.body.innerHTML =
-          "<h2 style='text-align:center'>Link not found</h2>";
+      }else{
+        document.body.innerHTML="<h2 style='text-align:center'>Link not found</h2>";
       }
     });
     return;
@@ -266,3 +363,5 @@ window.onload = ()=>{
   else showPin();
 }
 </script>
+</body>
+</html>
