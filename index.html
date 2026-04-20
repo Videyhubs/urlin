@@ -368,11 +368,12 @@ function redirectPage(target,code){
         </div>
           <div class="loader"></div>
           <p id="count">Redirect in ${sec} sec</p>
+          <img src="https://picsum.photos/900/400?${Date.now()}">
+          ${article.content}
         </div>
       </div>
     </div>
-          <img src="https://picsum.photos/900/400?${Date.now()}">
-          ${article.content}
+
   `;
 
   const timer = setInterval(()=>{
