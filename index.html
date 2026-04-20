@@ -360,11 +360,6 @@ function redirectPage(target,code){
           <h2>${article.title}</h2>
           <small>/${article.slug}</small>
           <p><i>${article.metaDescription}</i></p>
-
-          <img src="https://picsum.photos/900/400?${Date.now()}">
-
-          ${article.content}
-
           <div class="sticky-cta">
             <a href="https://whatsapp.com/channel/0029Vb7Vvuu89inibofPFy3Q" target="_blank">
               <button>Join WhatsApp Channel</button>
@@ -378,6 +373,8 @@ function redirectPage(target,code){
         </div>
       </div>
     </div>
+          <img src="https://picsum.photos/900/400?${Date.now()}">
+          ${article.content}
   `;
 
   const timer = setInterval(()=>{
